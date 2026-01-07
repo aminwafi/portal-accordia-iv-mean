@@ -12,7 +12,7 @@ const actionTypes = {
 
 async function writeLogToDB(userId, logType, actionType, description) {
     try {
-        await prisma.logs.create({
+        await prisma.log.create({
             data: {
                 userId: userId,
                 logType: logType,

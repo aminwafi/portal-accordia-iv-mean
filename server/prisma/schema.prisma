@@ -5,12 +5,12 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mysql"
+  url = env("DATABASE_URL")
 }
 
 model User {
@@ -18,18 +18,21 @@ model User {
   email       String    @db.VarChar(150) @unique
   username    String    @db.VarChar(150) @unique
   password    String
-  displayName String
   role        String
+  displayName String?
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
+  logs        Log[]
   @@map("users")
 }
 
 model Log {
-  userId      BigInt    @id
+  id          Int       @id @default(autoincrement())
+  userId      BigInt?
   logType     String
   actionType  String
   description String
   createdAt   DateTime  @default(now()) @map("created_at")
+  user        User?     @relation(fields: [userId], references: [id])
   @@map("logs")
 }
