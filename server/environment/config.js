@@ -1,18 +1,30 @@
 const nodemailer = require("nodemailer");
 
 const smtpConfig = {
-    base: {
-        node_env: process.env.NODE_ENV || "local",
-    },
     local: {
-        host: "localhost",
-        port: 1025,
-        secure: false,
-        from: 'donotreply@accordia.com'
+        host: process.env.SMTP_HOST || "localhost",
+        port: process.env.SMTP_PORT || 1025,
+        secure: process.env.SMTP_SECURE || false,
+        from: process.env.SMTP_FROM || 'donotreply@accordia.com'
     },
-    dev: {},
-    staging: {},
-    prod: {}
+    dev: {
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: process.env.SMTP_SECURE,
+        from: process.env.SMTP_FROM
+    },
+    staging: {
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: process.env.SMTP_SECURE,
+        from: process.env.SMTP_FROM
+    },
+    prod: {
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: process.env.SMTP_SECURE,
+        from: process.env.SMTP_FROM
+    }
 }
 
 const serverConfig = {
@@ -41,7 +53,7 @@ module.exports = {
     },
     SMTP_ENV: {
         ...smtpConfig.base,
-        ...smtpConfig[smtpConfig.base.node_env]
+        ...smtpConfig[serverConfig.base.node_env]
     },
     SMTPTransport
 }

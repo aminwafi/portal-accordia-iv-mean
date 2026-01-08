@@ -20,26 +20,20 @@ async function register(req, res) {
     const password = await bcrypt.hash(req.body.password, 10);
 
     try {
-        const { code, hash } = await generateOtp();
-
         const user = await prisma.user.create({
             data: {
                 email: email,
                 username: username,
                 password: password,
-                role: "user",
-                otps: {
-                    create: {
-                        code: hash,
-                        expiresAt: new Date(Date.now() + 5 * 60 * 1000)
-                    }
-                }
+                role: "user"
             }
         });
 
-        await sendOtp(user.username, email, code);
+        const code = await generateOtp(user);
 
-        await dbLog.write(user.id, 'Info', actionType, `${msg.SUCCESS.USER_CREATED}: ${email}`);
+        await sendOtp(user.username, user.email, code);
+
+        await dbLog.write(user.id, 'Info', actionType, `${msg.SUCCESS.USER_CREATED}: ${user.email}`);
         return res.status(status.CREATED).json({ 
             message: msg.SUCCESS.USER_CREATED, 
             status: 'success', 
@@ -70,14 +64,34 @@ async function register(req, res) {
     }
 }
 
-async function generateOtp() {
+async function generateOtp(user) {
     const actionType = dbLog.actionTypes.AUTH.GENERATE_OTP;
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
     const hash = crypto.createHash('sha256').update(code).digest('hex');
 
+    // INVALIDATE OLD OTP
+    await prisma.otp.updateMany({
+        where: {
+            userId: user.id,
+            isUsed: false
+        },
+        data: {
+            isUsed: true
+        }
+    });
+
+    await prisma.otp.create({
+        data: {
+            userId: user.id,
+            code: hash,
+            expireAt: new Date(Date.now() + 5 * 60 * 1000)
+        }
+    });
+
     await dbLog.write(null, 'Info', actionType, `${msg.SUCCESS.OTP_CREATED}`);
-    return { code, hash };
+
+    return code;
 }
 
 async function sendOtp(username, email, code) {
@@ -87,19 +101,10 @@ async function sendOtp(username, email, code) {
 async function verifyOtp(req, res) {
     const actionType = dbLog.actionTypes.AUTH.VERIFY;
     const email = req.body.email.toLowerCase();
-    const code  = req.body.code;
 
     try {
         const user = await prisma.user.findUnique({
-            where: { email },
-            include: {
-                otps: {
-                    where: {
-                       isUsed: false,
-                       code: crypto.createHash('sha256').update(code).digest('hex') 
-                    }
-                }
-            }
+            where: { email: email },
         });
 
         if (!user) {
@@ -107,9 +112,48 @@ async function verifyOtp(req, res) {
             return res.status(status.BAD_REQUEST).json({ message: msg.FAILURE.USER_NOT_FOUND, status: 'error' })
         }
 
+        if (user.isVerified == true) {
+            await dbLog.write(user.id, 'Error', actionType, `${msg.EXCEPTION.USER_ALREADY_VERIFIED}: ${user.email}`);
+            return res.status(status.BAD_REQUEST).json({ message: msg.EXCEPTION.USER_ALREADY_VERIFIED, status: 'error' });
+        }
 
+        const code = await prisma.otp.findFirst({
+            where: {
+                userId: user.id,
+                isUsed: false,
+                code: crypto.createHash('sha256').update(req.body.code).digest('hex').toString(),
+                expireAt: {
+                    gt: new Date()
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        if (!code) {
+            await dbLog.write(user.id, 'Error', actionType, `${msg.FAILURE.OTP_NOT_FOUND}`);
+            return res.status(status.BAD_REQUEST).json({ message: msg.FAILURE.OTP_NOT_FOUND, status: 'error' });
+        }
+
+        await prisma.$transaction([
+            prisma.otp.update({
+                where: { id: code.id },
+                data: { isUsed: true }
+            }),
+            prisma.user.update({
+                where: { id: user.id },
+                data: { isVerified: true }
+            })
+        ]);
+
+        await dbLog.write(user.id, 'Info', actionType, `${msg.SUCCESS.USER_VERIFIED}: ${user.email}`);
+        return res.status(status.OK).json({ message: msg.SUCCESS.USER_VERIFIED, status: 'success' });
     } catch (err) {
-
+        console.error(err);
+        
+        await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.INTERNAL_SERVER_ERROR}`);
+        return res.status(status.INTERNAL_SERVER_ERROR).json({ message: msg.FAILURE.INTERNAL_SERVER_ERROR, status: 'error' });
     }
 }
 
