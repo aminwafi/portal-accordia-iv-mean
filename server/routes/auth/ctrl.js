@@ -8,6 +8,7 @@ const prisma    = require("../../middleware/db");
 const msg       = require("../../environment/message");
 const dbLog     = require("../../utils/db-logger");
 const emailCtrl = require("../email/ctrl");
+const { SERVER_ENV } = require("../../environment/config");
 
 async function register(req, res) {
     const actionType = dbLog.actionTypes.AUTH.REGISTER;
@@ -38,8 +39,10 @@ async function register(req, res) {
             message: msg.SUCCESS.USER_CREATED, 
             status: 'success', 
             user: {
+                id: user.id.toString(),
+                email: user.email,
                 username: user.username,
-                email: user.email
+                role: user.role
             } 
         });
     } catch (err) {
@@ -109,7 +112,7 @@ async function verifyOtp(req, res) {
 
         if (!user) {
             await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.USER_NOT_FOUND}: ${email}`);
-            return res.status(status.BAD_REQUEST).json({ message: msg.FAILURE.USER_NOT_FOUND, status: 'error' })
+            return res.status(status.BAD_REQUEST).json({ message: msg.FAILURE.USER_NOT_FOUND, status: 'error' });
         }
 
         if (user.isVerified == true) {
@@ -148,7 +151,14 @@ async function verifyOtp(req, res) {
         ]);
 
         await dbLog.write(user.id, 'Info', actionType, `${msg.SUCCESS.USER_VERIFIED}: ${user.email}`);
-        return res.status(status.OK).json({ message: msg.SUCCESS.USER_VERIFIED, status: 'success' });
+        return res.status(status.OK).json({ message: msg.SUCCESS.USER_VERIFIED, 
+            user: {
+                id: user.id.toString(),
+                email: user.email,
+                username: user.username,
+                role: user.role
+            }, 
+            status: 'success' });
     } catch (err) {
         console.error(err);
         
@@ -161,7 +171,58 @@ async function login(req, res) {
     const actionType = dbLog.actionTypes.AUTH.LOGIN;
     const email = req.body.email.toLowerCase();
 
-    
+    try {
+        const user = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { email: email },
+                    { username: req.body.username }
+                ]
+            }
+        });
+
+        if (!user) {
+            await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.USER_NOT_FOUND}: ${email}`);
+            return res.status(status.BAD_REQUEST).json({ message: msg.FAILURE.USER_NOT_FOUND, status: 'error' });
+        }
+
+        if ((await bcrypt.compare(req.body.password, user.password)) !== true) {
+            await dbLog.write(user.id, 'Error', actionType, msg.FAILURE.INVALID_CREDENTIALS);
+            return res.status(status.UNAUTHORIZED).json({ message: msg.FAILURE.INVALID_CREDENTIALS, status: 'error' });
+        }
+
+        if (!user.isVerified) {
+            await dbLog.write(user.id, 'Error', actionType, msg.EXCEPTION.USER_NOT_VERIFIED);
+            return res.status(status.FORBIDDEN).json({ message: msg.EXCEPTION.USER_NOT_VERIFIED, status: 'error' });
+        }
+
+        const token = jwt.sign(
+            {
+                userId: user.id.toString(),
+                role: user.role
+            },
+            SERVER_ENV.jwt_secret,
+            {
+                expiresIn: '1h'
+            }
+        );
+
+        await dbLog.write(user.id, 'Info', actionType, msg.SUCCESS.USER_AUTHENTICATED);
+        return res.status(status.OK).json({ message: msg.SUCCESS.USER_AUTHENTICATED,
+            token, 
+            user: {
+                id: user.id.toString(),
+                email: user.email,
+                username: user.username,
+                role: user.role
+            }, 
+            status: 'success' });
+    } catch (err) {
+        console.error(err);
+        
+        await dbLog.write(null, 'Error', actionType, msg.FAILURE.INTERNAL_SERVER_ERROR);
+        return res.status(status.INTERNAL_SERVER_ERROR).json({ message: msg.FAILURE.INTERNAL_SERVER_ERROR, status: 'error' });
+    }
 }
 
 module.exports = {

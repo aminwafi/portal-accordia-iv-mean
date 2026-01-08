@@ -33,6 +33,7 @@ const serverConfig = {
         port_number: process.env.PORT_NUMBER || 3000
     },
     local: {
+        jwt_secret: process.env.JWT_SECRET || '000000',
         DB_HOST: "localhost",
         DB_PORT: 3306,
         DB_USERNAME: "",
