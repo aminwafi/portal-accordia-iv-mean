@@ -18,6 +18,8 @@
     "express": "^5.2.1",
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^7.0.12",
+    "nodemailer-express-handlebars": "^7.0.0",
     "prisma": "^5.22.0"
   }
 }

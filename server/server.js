@@ -11,6 +11,6 @@ app.use(express.json());
 
 app.use('/api', routes);
 
-app.listen(SERVER_ENV.PORT_NUMBER, () => {
-    console.log(`Server is listening on port ${SERVER_ENV.PORT_NUMBER}`);
+app.listen(SERVER_ENV.port_number, () => {
+    console.log(`Server is listening on port ${SERVER_ENV.port_number}`);
 });

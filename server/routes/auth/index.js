@@ -4,6 +4,7 @@ const authCtrl  = require("./ctrl");
 const router    = express.Router();
 
 router.post('/register', authCtrl.register);
+router.post('/verify', authCtrl.verifyOtp);
 router.post('/login', authCtrl.login);
 
 module.exports = router;

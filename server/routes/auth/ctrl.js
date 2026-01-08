@@ -7,6 +7,7 @@ const { status } = require("http-status");
 const prisma    = require("../../middleware/db");
 const msg       = require("../../environment/message");
 const dbLog     = require("../../utils/db-logger");
+const emailCtrl = require("../email/ctrl");
 
 async function register(req, res) {
     const actionType = dbLog.actionTypes.AUTH.REGISTER;
@@ -19,14 +20,24 @@ async function register(req, res) {
     const password = await bcrypt.hash(req.body.password, 10);
 
     try {
+        const { code, hash } = await generateOtp();
+
         const user = await prisma.user.create({
             data: {
                 email: email,
                 username: username,
                 password: password,
-                role: "user"
+                role: "user",
+                otps: {
+                    create: {
+                        code: hash,
+                        expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+                    }
+                }
             }
         });
+
+        await sendOtp(user.username, email, code);
 
         await dbLog.write(user.id, 'Info', actionType, `${msg.SUCCESS.USER_CREATED}: ${email}`);
         return res.status(status.CREATED).json({ 
@@ -38,7 +49,7 @@ async function register(req, res) {
             } 
         });
     } catch (err) {
-        console.log(err);
+        console.error(err);
 
         if (err.code === "P2002") {
             const target = err.meta?.target;
@@ -59,6 +70,49 @@ async function register(req, res) {
     }
 }
 
+async function generateOtp() {
+    const actionType = dbLog.actionTypes.AUTH.GENERATE_OTP;
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const hash = crypto.createHash('sha256').update(code).digest('hex');
+
+    await dbLog.write(null, 'Info', actionType, `${msg.SUCCESS.OTP_CREATED}`);
+    return { code, hash };
+}
+
+async function sendOtp(username, email, code) {
+    await emailCtrl.notificationEmail(username, email, code);
+}
+
+async function verifyOtp(req, res) {
+    const actionType = dbLog.actionTypes.AUTH.VERIFY;
+    const email = req.body.email.toLowerCase();
+    const code  = req.body.code;
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { email },
+            include: {
+                otps: {
+                    where: {
+                       isUsed: false,
+                       code: crypto.createHash('sha256').update(code).digest('hex') 
+                    }
+                }
+            }
+        });
+
+        if (!user) {
+            await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.USER_NOT_FOUND}: ${email}`);
+            return res.status(status.BAD_REQUEST).json({ message: msg.FAILURE.USER_NOT_FOUND, status: 'error' })
+        }
+
+
+    } catch (err) {
+
+    }
+}
+
 async function login(req, res) {
     const actionType = dbLog.actionTypes.AUTH.LOGIN;
     const email = req.body.email.toLowerCase();
@@ -68,5 +122,6 @@ async function login(req, res) {
 
 module.exports = {
     register,
+    verifyOtp,
     login
 }

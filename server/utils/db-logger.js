@@ -6,7 +6,10 @@ const actionTypes = {
         LOGIN: 'Login',
         LOGOUT: 'Logout',
         FORGOT: 'Forgot password',
-        RESET_PASSWORD: 'Reset password'
+        RESET_PASSWORD: 'Reset password',
+        GENERATE_OTP: 'Generate otp',
+        VERIFY: 'Verify otp',
+        SEND_OTP: 'Send otp'
     },
 };
 
