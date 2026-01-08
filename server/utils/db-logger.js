@@ -27,5 +27,5 @@ async function writeLogToDB(userId, logType, actionType, description) {
 
 module.exports = {
     actionTypes: actionTypes,
-    write: writeLogToDB,
+    write: writeLogToDB
 }

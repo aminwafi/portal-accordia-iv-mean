@@ -1,5 +1,5 @@
 const success = {
-    USER_CREATED: 'User has been created successfully'
+    USER_CREATED: 'User has been registered successfully'
 };
 
 const error = {

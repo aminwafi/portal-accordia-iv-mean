@@ -28,7 +28,7 @@ async function register(req, res) {
             }
         });
 
-        dbLog.write(user.userId, 'Info', actionType, `${msg.SUCCESS.USER_CREATED}: ${email}`);
+        await dbLog.write(user.id, 'Info', actionType, `${msg.SUCCESS.USER_CREATED}: ${email}`);
         return res.status(status.CREATED).json({ 
             message: msg.SUCCESS.USER_CREATED, 
             status: 'success', 
@@ -44,21 +44,29 @@ async function register(req, res) {
             const target = err.meta?.target;
 
             if (target?.includes("email")) {
-                dbLog.write(null, 'Error', actionType, `${msg.FAILURE.EMAIL_EXISTS}: ${email}`);
+                await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.EMAIL_EXISTS}: ${email}`);
                 return res.status(status.CONFLICT).json({ message: msg.FAILURE.EMAIL_EXISTS, status: 'error' });
             }
             
             if (target?.includes("username")) {
-                dbLog.write(null, 'Error', actionType, `${msg.FAILURE.USERNAME_EXISTS}: ${username}`);
+                await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.USERNAME_EXISTS}: ${username}`);
                 return res.status(status.CONFLICT).json({ message: msg.FAILURE.USERNAME_EXISTS, status: 'error' })
             }
         }
 
-        dbLog.write(null, 'Error', actionType, `${msg.FAILURE.INTERNAL_SERVER_ERROR}`);
+        await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.INTERNAL_SERVER_ERROR}`);
         return res.status(status.INTERNAL_SERVER_ERROR).json({ message: msg.FAILURE.INTERNAL_SERVER_ERROR, status: 'error' });
     }
 }
 
+async function login(req, res) {
+    const actionType = dbLog.actionTypes.AUTH.LOGIN;
+    const email = req.body.email.toLowerCase();
+
+    
+}
+
 module.exports = {
-    register
+    register,
+    login
 }
