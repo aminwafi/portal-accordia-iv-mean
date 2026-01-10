@@ -12,7 +12,9 @@ const error = {
     USER_NOT_FOUND: 'User not found',
     OTP_NOT_FOUND: 'Otp not found',
     INVALID_CREDENTIALS: 'Invalid credentials',
-    INTERNAL_SERVER_ERROR: 'Something went wrong. Please try again later.',
+    INVALID_TOKEN: 'Invalid or expired authorization token',
+    MISSING_AUTHORIZATION_TOKEN: 'Missing authorization token',
+    INTERNAL_SERVER_ERROR: 'Something went wrong. Please try again later.'
 };
 
 const exception = {

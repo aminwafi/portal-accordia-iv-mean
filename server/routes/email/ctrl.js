@@ -6,8 +6,6 @@ const hbs = hbsLib.default || hbsLib;
 
 const { SMTP_ENV, SMTPTransport } = require("../../environment/config");
 
-console.log(SMTP_ENV);
-
 async function notificationEmail(username, email, code) {
     SMTPTransport.use('compile', hbs({
         viewEngine: {

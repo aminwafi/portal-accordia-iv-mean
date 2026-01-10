@@ -30,19 +30,41 @@ const smtpConfig = {
 const serverConfig = {
     base: {
         node_env: process.env.NODE_ENV || "local",
-        port_number: process.env.PORT_NUMBER || 3000
+        port_number: process.env.PORT_NUMBER || 3000,
     },
     local: {
         jwt_secret: process.env.JWT_SECRET || '000000',
-        DB_HOST: "localhost",
-        DB_PORT: 3306,
-        DB_USERNAME: "",
-        DB_PASSWORD: "",
-        DB_NAME: "",
+        db_hostname: process.env.DB_HOSTNAME ||"localhost",
+        db_port_number: process.env.DB_PORT_NUMBER || 3306,
+        db_username: process.env.DB_USERNAME || "root",
+        db_password: process.env.DB_PASSWORD || "admin",
+        db_name: process.env.DB_NAME || "accordia_iv_mean",
+        db_log_options: ["query", "info", "warn", "error"]
     },
-    dev: {},
-    staging: {},
-    prod: {}
+    dev: {
+        db_hostname: process.env.DB_HOSTNAME,
+        db_port_number: process.env.DB_PORT_NUMBER,
+        db_username: process.env.DB_USERNAME,
+        db_password: process.env.DB_PASSWORD,
+        db_name: process.env.DB_NAME,
+        db_log_options: ["error"]
+    },
+    staging: {
+        db_hostname: process.env.DB_HOSTNAME,
+        db_port_number: process.env.DB_PORT_NUMBER,
+        db_username: process.env.DB_USERNAME,
+        db_password: process.env.DB_PASSWORD,
+        db_name: process.env.DB_NAME,
+        db_log_options: ["error"]
+    },
+    prod: {
+        db_hostname: process.env.DB_HOSTNAME,
+        db_port_number: process.env.DB_PORT_NUMBER,
+        db_username: process.env.DB_USERNAME,
+        db_password: process.env.DB_PASSWORD,
+        db_name: process.env.DB_NAME,
+        db_log_options: ["error"]
+    }
 };
 
 const SMTPTransport = nodemailer.createTransport(smtpConfig[serverConfig.base.node_env]);
@@ -50,11 +72,8 @@ const SMTPTransport = nodemailer.createTransport(smtpConfig[serverConfig.base.no
 module.exports = {
     SERVER_ENV: {
         ...serverConfig.base,
-        ...serverConfig[serverConfig.base.node_env]
+        ...serverConfig[serverConfig.base.node_env],
     },
-    SMTP_ENV: {
-        ...smtpConfig.base,
-        ...smtpConfig[serverConfig.base.node_env]
-    },
+    SMTP_ENV: smtpConfig[serverConfig.base.node_env],
     SMTPTransport
 }

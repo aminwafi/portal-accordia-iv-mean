@@ -9,7 +9,8 @@ const actionTypes = {
         RESET_PASSWORD: 'Reset password',
         GENERATE_OTP: 'Generate otp',
         VERIFY: 'Verify otp',
-        SEND_OTP: 'Send otp'
+        SEND_OTP: 'Send otp',
+        AUTHENTICATE: 'Authenticate user token'
     },
 };
 

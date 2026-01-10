@@ -4,11 +4,12 @@ const jwt       = require("jsonwebtoken");
 
 const { status } = require("http-status");
 
+const { SERVER_ENV } = require("../../environment/config");
+
 const prisma    = require("../../middleware/db");
 const msg       = require("../../environment/message");
 const dbLog     = require("../../utils/db-logger");
 const emailCtrl = require("../email/ctrl");
-const { SERVER_ENV } = require("../../environment/config");
 
 async function register(req, res) {
     const actionType = dbLog.actionTypes.AUTH.REGISTER;
