@@ -11,6 +11,22 @@ const msg       = require("../../environment/message");
 const dbLog     = require("../../utils/db-logger");
 const emailCtrl = require("../email/ctrl");
 
+function generateToken(user, scope) {
+    const token = jwt.sign(
+        {
+            userId: user.id.toString(),
+            role: user.role,
+            scope: scope
+        },
+        SERVER_ENV.jwt_secret,
+        {
+            expiresIn: '1h'
+        }
+    );
+
+    return token;
+}
+
 async function register(req, res) {
     const actionType = dbLog.actionTypes.AUTH.REGISTER;
     const email = req.body.email.toLowerCase();
@@ -35,6 +51,8 @@ async function register(req, res) {
 
         await sendOtp(user.username, user.email, code);
 
+        const token = generateToken(user, 'verify_otp');
+
         await dbLog.write(user.id, 'Info', actionType, `${msg.SUCCESS.USER_CREATED}: ${user.email}`);
         return res.status(status.CREATED).json({ 
             message: msg.SUCCESS.USER_CREATED, 
@@ -44,7 +62,8 @@ async function register(req, res) {
                 email: user.email,
                 username: user.username,
                 role: user.role
-            } 
+            },
+            token
         });
     } catch (err) {
         console.error(err);
@@ -104,15 +123,22 @@ async function sendOtp(username, email, code) {
 
 async function verifyOtp(req, res) {
     const actionType = dbLog.actionTypes.AUTH.VERIFY;
-    const email = req.body.email.toLowerCase();
+
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(status.UNAUTHORIZED).json({ message: 'Missing token' });
+    }
+
+    const payload = await verifyOtpToken(authHeader, actionType, res);
 
     try {
         const user = await prisma.user.findUnique({
-            where: { email: email },
+            where: { id: payload.userId },
         });
 
         if (!user) {
-            await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.USER_NOT_FOUND}: ${email}`);
+            await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.USER_NOT_FOUND}: ${payload.userId}`);
             return res.status(status.BAD_REQUEST).json({ message: msg.FAILURE.USER_NOT_FOUND, status: 'error' });
         }
 
@@ -168,22 +194,41 @@ async function verifyOtp(req, res) {
     }
 }
 
+async function verifyOtpToken(authHeader, actionType, res) {
+    const token = authHeader.replace('Bearer ', '');
+
+    try {
+        const payload = jwt.verify(token, SERVER_ENV.jwt_secret);
+    
+        if (payload.scope !== 'verify_otp') {
+            // ADD DBLOG
+            return res.status(status.FORBIDDEN).json({ message: 'Invalid token scope' });
+        }
+
+        return payload;
+    } catch (err) {
+        console.error(err);
+        // ADD DBLOG
+        return res.status(status.UNAUTHORIZED).json({ message: 'Invalid or expired token' });
+    }
+}
+
 async function login(req, res) {
     const actionType = dbLog.actionTypes.AUTH.LOGIN;
-    const email = req.body.email.toLowerCase();
+    const identifier = req.body.identifier.toLowerCase();
 
     try {
         const user = await prisma.user.findFirst({
             where: {
                 OR: [
-                    { email: email },
-                    { username: req.body.username }
+                    { email: identifier },
+                    { username: identifier }
                 ]
             }
         });
 
         if (!user) {
-            await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.USER_NOT_FOUND}: ${email}`);
+            await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.USER_NOT_FOUND}: ${identifier}`);
             return res.status(status.BAD_REQUEST).json({ message: msg.FAILURE.USER_NOT_FOUND, status: 'error' });
         }
 
@@ -193,20 +238,17 @@ async function login(req, res) {
         }
 
         if (!user.isVerified) {
+            const token = generateToken(user, 'verify_otp');
+
+            const code = await generateOtp(user);
+
+            await sendOtp(user.username, user.email, code);
+
             await dbLog.write(user.id, 'Error', actionType, msg.EXCEPTION.USER_NOT_VERIFIED);
-            return res.status(status.FORBIDDEN).json({ message: msg.EXCEPTION.USER_NOT_VERIFIED, status: 'error' });
+            return res.status(status.FORBIDDEN).json({ message: msg.EXCEPTION.USER_NOT_VERIFIED, status: 'error', token });
         }
 
-        const token = jwt.sign(
-            {
-                userId: user.id.toString(),
-                role: user.role
-            },
-            SERVER_ENV.jwt_secret,
-            {
-                expiresIn: '1h'
-            }
-        );
+        const token = generateToken(user);
 
         await dbLog.write(user.id, 'Info', actionType, msg.SUCCESS.USER_AUTHENTICATED);
         return res.status(status.OK).json({ message: msg.SUCCESS.USER_AUTHENTICATED,
