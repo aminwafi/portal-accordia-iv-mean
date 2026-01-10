@@ -112,7 +112,18 @@ export class HomeComponent {
   }
 
   switchTab(tab: 'register' | 'login') {
+    if (this.activeTab === tab) return;
+
     this.activeTab = tab;
+
+    this.registerForm.reset();
+    this.loginForm.reset();
+
+    this.registerError = null;
+    this.loginError = null;
+
+    this.isRegistering = false;
+    this.isLoggingIn = false;
   }
 
   openOtp(token: string) {
@@ -126,6 +137,8 @@ export class HomeComponent {
 
   onOtpVerified() {
     this.showOtpModal = false;
+    this.loginError = null;
+    this.loginForm.reset();
     alert('Account verified successfully');
   }
 
