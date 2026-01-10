@@ -18,7 +18,9 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(tap(res => localStorage.setItem('token', res.token)));
   }
 
-  verify(data: { identifier: string, code: string }) {
-    return this.http.post(`${this.apiUrl}/verify`, data);
+  verify(code: string, token: string) {
+    return this.http.post(`${this.apiUrl}/verify`, { code }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
   }
 }

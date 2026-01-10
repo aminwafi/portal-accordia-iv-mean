@@ -1,0 +1,36 @@
+<div class="backdrop">
+    <div class="modal">
+        <h2>Email verification</h2>
+        <p>Enter the 6-digit code sent to your email</p>
+
+        <form [formGroup]="otpForm" (ngSubmit)="verify()">
+            <input 
+                type="text"
+                maxlength="6"
+                formControlName="code"
+                inputmode="numeric"
+                placeholder="....."
+            />
+
+            <small *ngIf="otpForm.controls['code'].touched &&
+            otpForm.controls['code'].errors?.['required']">Otp is required</small>
+
+            <small *ngIf="otpForm.controls['code'].errors?.['minlength']">
+                OTP must be 6 digits
+            </small>
+
+            <div class="error" *ngIf="error">
+                {{ error }}
+            </div>
+
+            <div class="actions">
+                <button type="button" class="secondary" (click)="close.emit()">
+                    Cancel
+                </button>
+                <button type="submit" [disabled]="isVerifying">
+                    Verify
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
