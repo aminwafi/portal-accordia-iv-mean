@@ -1,0 +1,82 @@
+<div class="auth-container">
+    <header class="auth-header">
+        <h1>Welcome</h1>
+        <p>Create an account or login</p>
+    </header>
+
+    <div class="auth-grid">
+        <section class="auth-card">
+            <div class="tabs">
+                <button type="button" [class.active]="activeTab === 'register'"
+                (click)="switchTab('register')">Register</button>
+
+                <button type="button" [class.active]="activeTab === 'login'"
+                (click)="switchTab('login')">Login</button>
+            </div>
+
+            <form *ngIf="activeTab === 'register'" [formGroup]="registerForm" (ngSubmit)="register()" class="form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" 
+                        placeholder="Enter your email: (e.g: user@example.com)"
+                        formControlName="email"
+                    />
+                    <small *ngIf="rf['email'].touched &&
+                    rf['email'].invalid">Invalid email</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password"
+                        placeholder="Enter your password"
+                        formControlName="password"
+                    />
+                    <small *ngIf="rf['password'].touched &&
+                    rf['password'].errors?.['minlength']">Password must be at least 8 characters</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password"
+                        placeholder="Re-enter your password"
+                        formControlName="confirmPassword"
+                    />
+                    <small *ngIf="registerForm.errors?.['passwordMismatch']
+                    && rf['confirmPassword'].touched">Password do not match</small>
+                </div>
+
+                <div class="error" *ngIf="registerError">
+                    {{ registerError }}
+                </div>
+
+                <button type="submit" [disabled]="registerForm.invalid">
+                    Register
+                </button>
+            </form>
+
+            <form *ngIf="activeTab === 'login'" [formGroup]="loginForm" (ngSubmit)="login()" class="form">
+                <div class="form-group">
+                    <label>Email / Username</label>
+                    <input type="text" 
+                        formControlName="identifier" />
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password"
+                        formControlName="password">
+                </div>
+
+                <div class="error" *ngIf="loginError">
+                    {{ loginError }}
+                </div>
+
+                <button type="submit" [disabled]="loginForm.invalid">Login</button>
+            </form>
+        </section>
+    </div>
+</div>
+
+<app-otp-modal
+    *ngIf="showOtpModal" (verified)="onOtpVerified()" (close)="closeOtp()"
+></app-otp-modal>
