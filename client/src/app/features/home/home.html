@@ -1,0 +1,41 @@
+<div>
+    <header>
+
+    </header>
+
+    <section>
+        <form  [formGroup]="registerForm" (ngSubmit)="register()">
+            <div>
+                <label>Email</label>
+                <input type="email" 
+                    placeholder="Enter your email"
+                    formControlName="email"
+                />
+                <small *ngIf="registerForm.get('email')?.touched &&
+                registerForm.get('email')?.invalid">Invalid email</small>
+            </div>
+
+            <div>
+                <label>Password</label>
+                <input type="text"
+                    placeholder="Enter your password"
+                    formControlName="password"
+                />
+                <small *ngIf="registerForm.get('password')?.touched &&
+                registerForm.get('password')?.invalid">Password must be at least 8 characters</small>
+            </div>
+
+            <div>
+                <label>Confirm Password</label>
+                <input type="text"
+                    placeholder="Enter your password again"
+                    formControlName="confirmPassword"
+                />
+            </div>
+
+            <button type="submit" [disabled]="registerForm.invalid">
+                Register
+            </button>
+        </form>
+    </section>
+</div>
