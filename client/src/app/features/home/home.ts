@@ -70,9 +70,10 @@ export class HomeComponent {
     this.auth.register(payload)
     .pipe(finalize(() => (this.isRegistering = false)))
     .subscribe(({ 
-      next: () => {
+      next: (res: any) => {
       this.registerForm.reset();
-      alert(`Registration successful`)
+      alert(`Registration successful`);
+      this.openOtp(res.token);
     },
     error: (err) => {
       console.error(err);
