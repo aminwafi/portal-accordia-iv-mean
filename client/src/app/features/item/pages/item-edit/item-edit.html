@@ -1,0 +1,22 @@
+<div class="page">
+    <div class="page-header">
+        <h1>Update Item</h1>
+    </div>
+
+    <div *ngIf="loading">Loading...</div>
+
+    <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="submit()">
+        <label>
+            Name
+            <input formControlName="name" />
+        </label>
+
+        <label>
+            Description
+            <input formControlName="description" />
+        </label>
+
+        <button type="submiit">Update</button>
+        <a routerLink="/item">Cancel</a>
+    </form>
+</div>

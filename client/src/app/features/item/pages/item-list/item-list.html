@@ -1,0 +1,27 @@
+<div class="page">
+    <div class="page-header">
+        <h1>Items</h1>
+        <a routerLink="/item/new">+ Create item</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody *ngFor="let item of items">
+            <td>{{ item.name }}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.createdAt | date:'short' }}</td>
+            <td>
+                <a [routerLink]="['/item', item.id, 'edit']">Edit</a>
+                <button (click)="delete(item)">Delete</button>
+            </td>
+        </tbody>
+    </table>
+</div>
