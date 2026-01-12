@@ -12,6 +12,13 @@ const actionTypes = {
         SEND_OTP: 'Send otp',
         AUTHENTICATE: 'Authenticate user token'
     },
+    ITEM: {
+        LIST: 'List all item',
+        GET: 'Get an item',
+        CREATE: 'Create a new item',
+        UPDATE: 'Update an item',
+        DELETE: 'Delete an item'
+    }
 };
 
 async function writeLogToDB(userId, logType, actionType, description) {

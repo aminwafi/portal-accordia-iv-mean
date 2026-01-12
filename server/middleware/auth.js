@@ -16,13 +16,14 @@ function authenticate(req, res, next) {
         return res.status(status.UNAUTHORIZED).json({ message: msg.FAILURE.MISSING_AUTHORIZATION_TOKEN, status: 'error' });
     }
 
-    const token = authHeader.split('')[1];
+    const token = authHeader.split(' ')[1];
 
     try {
         const payload = jwt.verify(token, SERVER_ENV.jwt_secret);
 
         req.user = {
-            id: BigInt(payload.user.id),
+            ...payload,
+            id: BigInt(payload.userId),
         };
 
         next();
