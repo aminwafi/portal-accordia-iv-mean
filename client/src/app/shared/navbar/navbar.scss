@@ -42,3 +42,34 @@
     font-weight: 500;
 }
 
+.user-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 12px;
+}
+
+.avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(63, 81, 181, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.avatar mat-icon {
+    font-size: 28px;
+    color: #3f51b5
+}
+
+.username {
+    max-width: 240px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    text-align: center;
+}

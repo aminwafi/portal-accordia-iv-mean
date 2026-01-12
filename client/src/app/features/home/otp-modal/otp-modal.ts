@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-otp-modal',
@@ -22,7 +23,10 @@ export class OtpModalComponent {
     code: new FormControl('', [Validators.required, Validators.minLength(6), Validators.maxLength(6)])
   });
 
-  constructor(private auth: AuthService) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router
+  ) {}
 
   verify(): void {
     this.error = null;
@@ -38,7 +42,7 @@ export class OtpModalComponent {
       return;
     }
 
-    this.isVerifying = false;
+    this.isVerifying = true;
 
     this.auth
     .verify(this.otpForm.value.code!, token)
@@ -46,8 +50,8 @@ export class OtpModalComponent {
     .subscribe({
       next: (res: any) => {
         sessionStorage.removeItem('verify_token');
-        localStorage.setItem('access_token', res.accessToken);
         this.verified.emit();
+        this.router.navigate(['/item']);
       },
       error: (err) => {
         this.error = err?.error?.message || 'Invalid OTP';

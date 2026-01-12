@@ -28,7 +28,7 @@ export class NavbarComponent {
 
   constructor(
     private breakpoint: BreakpointObserver,
-    private auth: AuthService
+    public auth: AuthService
   ) {}
 
   ngAfterViewInit() {

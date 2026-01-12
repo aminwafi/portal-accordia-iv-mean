@@ -3,6 +3,16 @@
         #sidenav
         class="sidenav"
     >
+        <div class="user-section">
+            <div class="avatar">
+                <mat-icon>person</mat-icon>
+            </div>
+
+            <div class="username" [title]="auth.user?.username">
+                Hello, {{ auth.user?.username || 'User' }}
+            </div>
+        </div>
+
         <mat-nav-list>
             <mat-list-item 
                 routerLink="/item" 

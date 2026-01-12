@@ -3,36 +3,27 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { tap } from 'rxjs'; 
 import { Router } from '@angular/router';
+import { User } from '../models/user';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
+  
+  public user: User | null = null;
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
   ) {}
-  register(data: { email: string; password: string }) {
-    return this.http.post(`${this.apiUrl}/register`, data);
-  }
 
-  login(data: { identifier: string; password: string }) {
-    return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(tap(res => localStorage.setItem('access_token', res.token)));
-  }
-
-  verify(code: string, token: string) {
-    return this.http.post(`${this.apiUrl}/verify`, { code }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-  }
-
-  logout() {
-    localStorage.clear();
-    sessionStorage.clear();
-    alert('Logout successful');
-    this.router.navigate(['/home']);
+  private decodeToken(token: string): any | null {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch {
+      return null;
+    }
   }
 
   getToken(): string | null {
@@ -48,11 +39,75 @@ export class AuthService {
     if (!token) return null;
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = this.decodeToken(token);
       return payload.role ?? null;
     } catch (err) {
       return null;
     }
   }
 
+  setUser(user: User) {
+    this.user = user;
+  }
+
+  clearUser() {
+    this.user = null;
+  }
+
+  initUser() {
+    const token = this.getToken();
+    if (!token) return;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+
+      this.user = {
+        id: payload.userId,
+        username: payload.username
+      };
+    } catch {
+      this.clearUser();
+      localStorage.removeItem('access_token');
+    }
+  }
+
+  register(data: { email: string; password: string }) {
+    return this.http.post(`${this.apiUrl}/register`, data);
+  }
+
+  login(data: { identifier: string; password: string }) {
+    return this.http.post<any>(`${this.apiUrl}/login`, data)
+    .pipe(tap(res => {
+      localStorage.setItem('access_token', res.token);
+
+      const payload = this.decodeToken(res.token);;
+
+      this.setUser({
+        id: payload.userId,
+        username: payload.username
+      });
+    }));
+  }
+
+  verify(code: string, otpToken: string) {
+    return this.http.post(`${this.apiUrl}/verify`, { code }, {
+      headers: { Authorization: `Bearer ${otpToken}` }
+    }).pipe(tap((res: any) => {
+        localStorage.setItem('access_token', res.token);
+
+        const payload = this.decodeToken(res.token);
+
+        this.setUser({
+          id: payload.userId,
+          username: payload.username
+        });
+    }));
+  }
+
+  logout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    alert('Logout successful');
+    this.router.navigate(['/home']);
+  }
 }

@@ -16,6 +16,8 @@ import { CommonModule } from '@angular/common';
   // styleUrl: './app.scss'
 })
 export class App {
-  constructor(public auth: AuthService ) {}
+  constructor(public auth: AuthService ) {
+      this.auth.initUser();
+  }
   protected readonly title = signal('client');
 }
