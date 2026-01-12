@@ -15,6 +15,7 @@ function generateToken(user, scope) {
     const token = jwt.sign(
         {
             userId: user.id.toString(),
+            username: user.username,
             role: user.role,
             scope: scope
         },
@@ -177,14 +178,11 @@ async function verifyOtp(req, res) {
             })
         ]);
 
+        const token = generateToken(user);
+
         await dbLog.write(user.id, 'Info', actionType, `${msg.SUCCESS.USER_VERIFIED}: ${user.email}`);
         return res.status(status.OK).json({ message: msg.SUCCESS.USER_VERIFIED, 
-            user: {
-                id: user.id.toString(),
-                email: user.email,
-                username: user.username,
-                role: user.role
-            }, 
+            token, 
             status: 'success' });
     } catch (err) {
         console.error(err);
@@ -252,13 +250,7 @@ async function login(req, res) {
 
         await dbLog.write(user.id, 'Info', actionType, msg.SUCCESS.USER_AUTHENTICATED);
         return res.status(status.OK).json({ message: msg.SUCCESS.USER_AUTHENTICATED,
-            token, 
-            user: {
-                id: user.id.toString(),
-                email: user.email,
-                username: user.username,
-                role: user.role
-            }, 
+            token,
             status: 'success' });
     } catch (err) {
         console.error(err);
