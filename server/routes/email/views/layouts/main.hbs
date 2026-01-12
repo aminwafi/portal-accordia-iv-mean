@@ -1,15 +1,26 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
-        <style>
-            body { font-family: Arial, sans-serif; }
-            .container { padding: 20px; }
-        </style>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>{{title}}</title>
     </head>
-    <body>
-        <div class="container">
-            {{body}}
-        </div>
+    <body style="margin:0; padding:0; background-color:#f4f6f8;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8">
+            <tr>
+                <td align="center" style="padding:24px 12px;">
+                    <table width="100%" cellpadding="0" cellspacing="0"
+                        style="max-width:480px; background:#ffffff; border-radius:8px;
+                        box-shadow:0 4px 12px rgba(0,0,0,0.8); overflow:hidden;"
+                    >
+                        <tr>
+                            <td style="padding:24px; font-family:Arial, Helvetica, sans-serif;">
+                                {{{body}}}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
     </body>
 </html>

@@ -12,7 +12,7 @@ async function notificationEmail(username, email, code) {
             extname: '.hbs',
             layoutsDir: path.join(__dirname, 'views/layouts'),
             defaultLayout: 'main',
-            partialsDir: path.join(__dirname, 'views')
+            partialsDir: path.join(__dirname, 'views/partials')
         },
         viewPath: path.join(__dirname, 'views/templates'),
         extName: '.hbs'
@@ -21,9 +21,10 @@ async function notificationEmail(username, email, code) {
     const mailOptions = {
         from: SMTP_ENV.from,
         to: email,
-        subject: 'Welcome to Accordia IV Mean',
+        subject: 'Welcome to Accordia IV MEAN',
         template: 'otp',
         context: {
+            title: 'OTP Verification',
             username: username,
             code: code
         }
