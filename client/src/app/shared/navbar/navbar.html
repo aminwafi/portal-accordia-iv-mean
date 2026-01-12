@@ -1,18 +1,30 @@
-<mat-toolbar color="primary" class="navbar">
-    <button
-        mat-icon-button
-        class="menu-btn"
-        (click)="toggle()"
-        aria-label="Toggle menu"
+<mat-sidenav-container class="layout">
+    <mat-sidenav
+        #sidenav
+        class="sidenav"
     >
-        <mat-icon>menu</mat-icon>
-    </button>
+        <mat-nav-list>
+            <mat-list-item (click)="logout()" class="nav-item">
+                <mat-icon matListItemIcon>logout</mat-icon>
+                <span matListItemTitle>Logout</span>
+            </mat-list-item>
+        </mat-nav-list>
+    </mat-sidenav>
 
-    <span class="spacer"></span>
-</mat-toolbar>
+    <mat-sidenav-content>
+        <mat-toolbar color="primary" class="navbar">
+            <button
+                mat-icon-button
+                (click)="toggleSidenav()"
+                aria-label="Open menu"
+            >
+                <mat-icon>menu</mat-icon>
+            </button>
 
-<div class="mobile-menu" *ngIf="isOpen">
-    <button mat-button color="warn" (click)="logout()">
-        Logout
-    </button>
-</div>
+            <span class="title">Accordia Portal</span>
+            <span class="spacer"></span>
+        </mat-toolbar>
+
+        <ng-content></ng-content>
+    </mat-sidenav-content>
+</mat-sidenav-container>

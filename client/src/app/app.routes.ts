@@ -6,4 +6,5 @@ import { userGuard } from './core/guards/user-guard';
 export const routes: Routes = [
     { path: 'home', component: HomeComponent, canActivate: [userGuard] },
     { path: 'item', loadChildren: () => import('./features/item/item.routes'), canActivate: [authGuard]},
+    { path: '**', redirectTo: '/home', pathMatch: 'full' }
 ];
