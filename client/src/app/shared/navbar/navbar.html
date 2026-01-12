@@ -4,11 +4,22 @@
         class="sidenav"
     >
         <mat-nav-list>
+            <mat-list-item 
+                routerLink="/item" 
+                routerLinkActive="active"
+                (click)="sidenav.close()"
+            >
+                <mat-icon matListItemIcon>inventory_2</mat-icon>
+                <span matListItemTitle>Items</span>
+            </mat-list-item>
+
             <mat-list-item (click)="logout()" class="nav-item">
                 <mat-icon matListItemIcon>logout</mat-icon>
                 <span matListItemTitle>Logout</span>
             </mat-list-item>
         </mat-nav-list>
+
+        <mat-divider></mat-divider>
     </mat-sidenav>
 
     <mat-sidenav-content>

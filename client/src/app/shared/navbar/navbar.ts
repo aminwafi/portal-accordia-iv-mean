@@ -39,6 +39,7 @@ export class NavbarComponent {
 
       setTimeout(() => {
         this.sidenav.close();
+        window.dispatchEvent(new Event('resize'));
       });
     });
   }

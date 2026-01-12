@@ -14,11 +14,6 @@ export class AuthService {
     private http: HttpClient,
     private router: Router
   ) {}
-
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem('access_token');
-  }
-
   register(data: { email: string; password: string }) {
     return this.http.post(`${this.apiUrl}/register`, data);
   }
@@ -39,4 +34,25 @@ export class AuthService {
     alert('Logout successful');
     this.router.navigate(['/home']);
   }
+
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
+
+  getRole(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role ?? null;
+    } catch (err) {
+      return null;
+    }
+  }
+
 }

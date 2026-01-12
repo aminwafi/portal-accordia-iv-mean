@@ -10,7 +10,7 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th>Created Date</th>
-                <th>Actions</th>
+                <th *ngIf="auth.getRole() === 'admin'">Actions</th>
             </tr>
         </thead>
 
@@ -18,7 +18,7 @@
             <td>{{ item.name }}</td>
             <td>{{ item.description }}</td>
             <td>{{ item.createdAt | date:'short' }}</td>
-            <td>
+            <td *ngIf="auth.getRole() === 'admin'">
                 <a [routerLink]="['/item', item.id, 'edit']">Edit</a>
                 <button (click)="delete(item)">Delete</button>
             </td>

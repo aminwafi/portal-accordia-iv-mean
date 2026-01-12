@@ -3,6 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ItemService } from "../../../../core/services/item";
 import { Item } from '../../item.model';
+import { AuthService } from '../../../../core/services/auth';
 
 @Component({
   selector: 'app-item-list',
@@ -19,7 +20,10 @@ export class ItemListComponent implements OnInit {
   items: Item[] = [];
   loading = false;
 
-  constructor(private item: ItemService) {}
+  constructor(
+    public auth: AuthService,
+    private item: ItemService
+  ) {}
   
   ngOnInit(): void {
     this.load();
