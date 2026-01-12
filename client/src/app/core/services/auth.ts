@@ -11,12 +11,16 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('access_token');
+  }
+
   register(data: { email: string; password: string }) {
     return this.http.post(`${this.apiUrl}/register`, data);
   }
 
   login(data: { identifier: string; password: string }) {
-    return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(tap(res => localStorage.setItem('token', res.token)));
+    return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(tap(res => localStorage.setItem('access_token', res.token)));
   }
 
   verify(code: string, token: string) {

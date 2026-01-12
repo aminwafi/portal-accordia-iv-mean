@@ -31,7 +31,7 @@ export class ItemCreateComponent {
   }
 
   submit() {
-    if (!this.form.invalid) return;
+    if (this.form.invalid) return;
 
     this.saving = true;
     this.item.create(this.form.value).subscribe(() => {

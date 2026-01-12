@@ -28,8 +28,8 @@ export class ItemListComponent implements OnInit {
   load() {
     this.loading = true;
     this.item.list().subscribe({
-      next: data => {
-        this.items = data;
+      next: res => {
+        this.items = res.items;
         this.loading = false;
       },
       error: () => (this.loading = false)

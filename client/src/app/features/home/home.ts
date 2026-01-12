@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators, FormGroup, AbstractContro
 import { AuthService } from '../../core/services/auth';
 import { finalize } from 'rxjs';
 import { OtpModalComponent } from './otp-modal/otp-modal';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -26,6 +27,7 @@ export class HomeComponent {
   showOtpModal = false;
 
   constructor(
+    private router: Router,
     private fb: FormBuilder,
     private auth: AuthService
   ){
@@ -96,7 +98,8 @@ export class HomeComponent {
     .pipe(finalize(() => (this.isLoggingIn = false)))
     .subscribe({
       next: () => {
-        alert('Login successful')
+        alert('Login successful');
+        this.router.navigate(['/item'], { replaceUrl: true })
       },
       error: (err) => {
         console.error(err);

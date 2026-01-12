@@ -12,12 +12,12 @@ export class ItemService {
 
   constructor(private http: HttpClient) {}
 
-  list(): Observable<Item[]> {
-    return this.http.get<Item[]>(`${this.apiUrl}/`);
+  list(): Observable<{ items: Item[] }> {
+    return this.http.get<{ items: Item[] }>(`${this.apiUrl}/`);
   }
 
-  get(id: string): Observable<Item> {
-    return this.http.get<Item>(`${this.apiUrl}/${id}`);
+  get(id: string): Observable<{ item: Item }> {
+    return this.http.get<{ item: Item }>(`${this.apiUrl}/${id}`);
   }
 
   create(data: Partial<Item>): Observable<Item> {

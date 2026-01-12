@@ -42,8 +42,8 @@ export class ItemEditComponent implements OnInit {
 
       this.id = id;
 
-      this.item.get(this.id).subscribe((item) => {
-        this.form.patchValue(item);
+      this.item.get(this.id).subscribe((res) => {
+        this.form.patchValue(res.item);
         this.loading = false
       });
   }
