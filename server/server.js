@@ -6,6 +6,10 @@ const routes = require("./routes/index.js");
 
 const app = express();
 
+BigInt.prototype.toJSON = function () {
+    return this.toString();
+}
+
 app.use(cors());
 app.use(express.json());
 
