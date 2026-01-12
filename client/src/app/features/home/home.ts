@@ -5,10 +5,16 @@ import { AuthService } from '../../core/services/auth';
 import { finalize } from 'rxjs';
 import { OtpModalComponent } from './otp-modal/otp-modal';
 import { Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, ReactiveFormsModule, OtpModalComponent],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    OtpModalComponent,
+    MatIconModule
+  ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -24,6 +30,10 @@ export class HomeComponent {
 
   activeTab: 'register' | 'login' = 'register';
 
+  showRegisterPassword = false;
+  showRegisterConfirmPassword = false;
+  showLoginPassword = false;
+
   showOtpModal = false;
 
   constructor(
@@ -34,7 +44,11 @@ export class HomeComponent {
 
     this.registerForm = this.fb.nonNullable.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [
+        Validators.required, 
+        Validators.minLength(8),
+        this.passwordStrengthValidator
+      ]],
       confirmPassword: ['', Validators.required]
     },
     { validators: this.passwordMatchValidator }
@@ -52,6 +66,36 @@ export class HomeComponent {
 
     if (!password || !confirmPassword) return null;
     return password == confirmPassword ? null : { passwordMismatch: true };
+  }
+
+  passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
+    const password = control.value as string;
+
+    if (!password) return null;
+
+    const errors: ValidationErrors = {};
+
+    if (!/[A-Z]/.test(password)) {
+      errors['uppercase'] = true;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      errors['lowercase'] = true;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      errors['number'] = true;
+    }
+
+    if (!/[#?!@$%^&*-]/.test(password)) {
+      errors['special'] = true;
+    }
+
+    if (/\s/.test(password)) {
+      errors['space'] = true;
+    }
+
+    return Object.keys(errors).length ? errors : null;
   }
 
   register(): void {
@@ -127,6 +171,10 @@ export class HomeComponent {
 
     this.isRegistering = false;
     this.isLoggingIn = false;
+
+    this.showRegisterPassword = false;
+    this.showRegisterConfirmPassword = false;
+    this.showLoginPassword = false;
   }
 
   openOtp(token: string) {
