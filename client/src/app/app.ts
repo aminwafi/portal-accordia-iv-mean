@@ -1,13 +1,21 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from './shared/navbar/navbar';
+import { AuthService } from './core/services/auth';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [
+    RouterOutlet,
+    NavbarComponent,
+    CommonModule
+  ],
   standalone: true,
-  template: '<router-outlet />',
+  templateUrl: './app.html',
   // styleUrl: './app.scss'
 })
 export class App {
+  constructor(public auth: AuthService ) {}
   protected readonly title = signal('client');
 }

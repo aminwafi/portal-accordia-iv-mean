@@ -1,0 +1,18 @@
+<mat-toolbar color="primary" class="navbar">
+    <button
+        mat-icon-button
+        class="menu-btn"
+        (click)="toggle()"
+        aria-label="Toggle menu"
+    >
+        <mat-icon>menu</mat-icon>
+    </button>
+
+    <span class="spacer"></span>
+</mat-toolbar>
+
+<div class="mobile-menu" *ngIf="isOpen">
+    <button mat-button color="warn" (click)="logout()">
+        Logout
+    </button>
+</div>

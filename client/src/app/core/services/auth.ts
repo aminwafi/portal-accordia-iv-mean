@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { tap } from 'rxjs'; 
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,10 @@ import { tap } from 'rxjs';
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem('access_token');
@@ -27,5 +31,11 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/verify`, { code }, {
       headers: { Authorization: `Bearer ${token}` }
     });
+  }
+
+  logout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    this.router.navigate(['/home']);
   }
 }
