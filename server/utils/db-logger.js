@@ -11,7 +11,9 @@ const actionTypes = {
         VERIFY: 'Verify otp',
         SEND_OTP: 'Send otp',
         AUTHENTICATE: 'Authenticate user token',
-        AUTHENTICATE_ADMIN: 'Authenticate admin'
+        AUTHENTICATE_VERIFY_OTP: 'Authenticate verify otp token',
+        AUTHENTICATE_ADMIN: 'Authenticate admin',
+        VALIDATE_SCHEMA: 'Validate schema'
     },
     ITEM: {
         LIST: 'List all item',

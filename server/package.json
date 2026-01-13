@@ -17,6 +17,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "http-status": "^2.1.0",
+    "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^7.0.12",
     "nodemailer-express-handlebars": "^7.0.0",

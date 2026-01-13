@@ -18,9 +18,11 @@ const error = {
     OTP_NOT_FOUND: 'Otp not found',
     INVALID_CREDENTIALS: 'Invalid credentials',
     INVALID_TOKEN: 'Invalid or expired authorization token',
+    MISSING_TOKEN_SCOPE: 'Missing required token scope',
     MISSING_AUTHORIZATION_TOKEN: 'Missing authorization token',
     ITEM_NOT_FOUND: 'Item not found',
     MISSING_ADMIN_PRIVILEGE: 'Missing admin role',
+    SCHEMA_VALIDATION_FAILED: 'Schema validation failed',
     INTERNAL_SERVER_ERROR: 'Something went wrong. Please try again later.'
 };
 

@@ -45,7 +45,6 @@ async function getItem(req, res) {
 
 async function createItem(req, res) {
     const actionType = dbLog.actionTypes.ITEM.CREATE;
-    console.log(req.user);
 
     try {
         const item = await prisma.item.create({
