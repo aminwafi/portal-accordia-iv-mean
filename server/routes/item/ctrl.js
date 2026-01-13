@@ -76,8 +76,6 @@ async function updateItem(req, res) {
             }
         });
 
-        console.log(item);
-
         await dbLog.write(req.userId, 'Info', actionType, msg.SUCCESS.ITEM_UPDATED);
         return res.status(status.OK).json({ message: msg.SUCCESS.ITEM_UPDATED, item, status: 'success' });
     } catch (err) {
