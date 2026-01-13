@@ -73,3 +73,18 @@
     font-weight: 600;
     text-align: center;
 }
+
+.app-title {
+    position: relative;
+}
+
+.app-title::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 24px;
+    height: 3px;
+    border-radius: 2px;
+    background: #93c5fd;
+}
