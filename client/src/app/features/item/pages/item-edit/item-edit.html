@@ -1,22 +1,39 @@
 <div class="page">
-    <div class="page-header">
-        <h1>Update Item</h1>
+    <mat-toolbar class="page-header custom-header">
+        <div class="title-group">
+            <span class="page-title">Update Item</span>
+        </div>
+    </mat-toolbar>
+
+    <div *ngIf="loading" class="loading">
+        <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
     </div>
 
-    <div *ngIf="loading">Loading...</div>
+    <mat-card *ngIf="!loading" class="form-card">
+        <form [formGroup]="form" (ngSubmit)="submit()">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" />
+                <mat-error *ngIf="form.get('name')?.hasError('required')">
+                    Name is required
+                </mat-error>
+            </mat-form-field>
 
-    <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="submit()">
-        <label>
-            Name
-            <input formControlName="name" />
-        </label>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput rows="3" formControlName="description"></textarea>
+            </mat-form-field>
 
-        <label>
-            Description
-            <input formControlName="description" />
-        </label>
+            <div class="form-actions">
+                <button mat-flat-button color="primary"
+                type="submit" [disabled]="form.invalid">
+                    Update
+                </button>
 
-        <button type="submiit">Update</button>
-        <a routerLink="/item">Cancel</a>
-    </form>
+                <button mat-button routerLink="/item" type="button">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </mat-card>
 </div>

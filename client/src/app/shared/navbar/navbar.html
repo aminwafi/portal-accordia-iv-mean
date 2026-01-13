@@ -17,6 +17,7 @@
             <mat-list-item 
                 routerLink="/item" 
                 routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
                 (click)="sidenav.close()"
             >
                 <mat-icon matListItemIcon>inventory_2</mat-icon>
