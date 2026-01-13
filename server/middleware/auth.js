@@ -34,6 +34,18 @@ function authenticate(req, res, next) {
     }
 }
 
+function isAdmin(req, res, next) {
+    const actionType = dbLog.actionTypes.AUTH.AUTHENTICATE_ADMIN;
+
+    if (!req.user.role === 'admin') {
+        dbLog.write(null, 'Error', actionType, msg.FAILURE.MISSING_ADMIN_PRIVILEGE);
+        return res.status(status.FORBIDDEN).json({ message: msg.FAILURE.MISSING_ADMIN_PRIVILEGE, status: 'error' });
+    }
+
+    next();
+}
+
 module.exports = {
-    authenticate
+    authenticate,
+    isAdmin
 }

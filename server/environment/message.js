@@ -20,6 +20,7 @@ const error = {
     INVALID_TOKEN: 'Invalid or expired authorization token',
     MISSING_AUTHORIZATION_TOKEN: 'Missing authorization token',
     ITEM_NOT_FOUND: 'Item not found',
+    MISSING_ADMIN_PRIVILEGE: 'Missing admin role',
     INTERNAL_SERVER_ERROR: 'Something went wrong. Please try again later.'
 };
 

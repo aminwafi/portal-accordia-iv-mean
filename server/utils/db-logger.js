@@ -10,7 +10,8 @@ const actionTypes = {
         GENERATE_OTP: 'Generate otp',
         VERIFY: 'Verify otp',
         SEND_OTP: 'Send otp',
-        AUTHENTICATE: 'Authenticate user token'
+        AUTHENTICATE: 'Authenticate user token',
+        AUTHENTICATE_ADMIN: 'Authenticate admin'
     },
     ITEM: {
         LIST: 'List all item',
