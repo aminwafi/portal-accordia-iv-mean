@@ -18,6 +18,7 @@ function validateSchema(schema, property) {
         });
 
         if (error) {
+            console.error(err);
             dbLog.write(null, 'Error', actionType, msg.FAILURE.SCHEMA_VALIDATION_FAILED);
             return res.status(status.BAD_REQUEST).json({ message: msg.FAILURE.SCHEMA_VALIDATION_FAILED, status: 'error' });
         }
