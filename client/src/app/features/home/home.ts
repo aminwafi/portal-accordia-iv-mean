@@ -119,7 +119,7 @@ export class HomeComponent {
       next: (res: any) => {
       this.registerForm.reset();
       alert(`Registration successful`);
-      this.openOtp(res.token);
+      this.openOtp(res.otpToken);
     },
     error: (err) => {
       console.error(err);
@@ -151,7 +151,7 @@ export class HomeComponent {
           err?.error?.message || 'Invalid credentials'
 
         if (err?.error?.message === 'User not verified') {
-          this.openOtp(err?.error?.token);
+          this.openOtp(err?.error?.otpToken);
           return;
         }
       }
