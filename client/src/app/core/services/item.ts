@@ -8,7 +8,12 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class ItemService {
-  private apiUrl = `${environment.apiUrl}/item`;
+
+  private readonly item = '/item';
+  private readonly admin = '/admin';
+
+  private apiUrl = `${environment.apiUrl}${this.item}`;
+  private apiUrlAdmin = `${environment.apiUrl}${this.admin}${this.item}`;
 
   constructor(private http: HttpClient) {}
 
@@ -25,10 +30,10 @@ export class ItemService {
   }
 
   update(id: string, data: Partial<Item>): Observable<Item> {
-    return this.http.put<Item>(`${this.apiUrl}/${id}`, data);
+    return this.http.put<Item>(`${this.apiUrlAdmin}/${id}`, data);
   }
 
   delete(id: string): Observable<Item> {
-    return this.http.delete<Item>(`${this.apiUrl}/${id}`);
+    return this.http.delete<Item>(`${this.apiUrlAdmin}/${id}`);
   }
 }
