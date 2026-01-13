@@ -43,6 +43,6 @@ Backend API will be available at http://localhost:3000
 2. Configure database credentials in backend environment config
 3. Run Prisma migrations:
 
-``bash
+```bash
 npx prisma migrate dev --name init
 ```
