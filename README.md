@@ -10,7 +10,6 @@ Prerequisite:
 - Node JS v22+
 - npm
 - MySQL
-Tip:
 
 
 ## Frontend setup
