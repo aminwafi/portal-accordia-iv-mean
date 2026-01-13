@@ -3,13 +3,25 @@ import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ItemService } from '../../../../core/services/item';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-item-create',
   imports: [
     ReactiveFormsModule,
     CommonModule,
-    RouterModule
+    RouterModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule
   ],
   templateUrl: './item-create.html',
   styleUrl: './item-create.scss',
