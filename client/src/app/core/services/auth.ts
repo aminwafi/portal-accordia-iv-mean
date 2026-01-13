@@ -59,7 +59,7 @@ export class AuthService {
     if (!token) return;
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = this.decodeToken(token);
 
       this.user = {
         id: payload.userId,
@@ -69,6 +69,17 @@ export class AuthService {
       this.clearUser();
       localStorage.removeItem('access_token');
     }
+  }
+
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+
+    if (!token) return true;
+
+    const payload = this.decodeToken(token);
+    const now = Math.floor(Date.now() / 1000);
+
+    return payload.exp < now;
   }
 
   register(data: { email: string; password: string }) {

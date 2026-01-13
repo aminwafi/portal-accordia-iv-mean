@@ -11,6 +11,11 @@ export const authGuard: CanActivateFn = (route) => {
     return false;
   }
 
+  if (auth.isTokenExpired()) {
+    auth.logout();
+    return false;
+  }
+
   const allowedRoles = route.data?.['roles'] as string | undefined;
 
   if (allowedRoles && !allowedRoles.includes(auth.getRole()!)) {

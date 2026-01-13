@@ -18,6 +18,10 @@ import { CommonModule } from '@angular/common';
 export class App {
   constructor(public auth: AuthService ) {
       this.auth.initUser();
+
+      if (this.auth.isTokenExpired()) {
+        this.auth.logout();
+      }
   }
   protected readonly title = signal('client');
 }
