@@ -78,9 +78,11 @@
     margin-bottom: 14px;
 
     label {
-        font-size: 14px;
+        font-size: 12px;
+        font-weight: 500;
         margin-bottom: 4px;
-        color: #374151;
+        color: #475569;
+        letter-spacing: 0.01em;
     }
 
     input {
@@ -101,6 +103,14 @@
         font-size: 12px;
         margin-top: 4px;
     }
+}
+
+.form-group input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    opacity: 1;
 }
 
 button[type='submit'] {
@@ -127,4 +137,40 @@ button[type='submit'] {
     margin-top: 8px;
     color: #b91c1c;
     font-size: 13px;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding: 0.75rem 2.75rem 0.75rem 0.75rem;
+    box-sizing: border-box;
+}
+
+.password-wrapper mat-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    font-size: 20px;
+}
+
+.password-wrapper mat-icon:hover {
+    color: #000;
+}
+
+.password-errors {
+    margin-top: 6px;
+}
+
+.password-errors small {
+    display: block;
+}
+
+.password-errors .title {
+    margin-bottom: 4px;
 }

@@ -15,6 +15,7 @@ function generateToken(user, scope) {
     const token = jwt.sign(
         {
             userId: user.id.toString(),
+            username: user.username,
             role: user.role,
             scope: scope
         },
@@ -51,7 +52,7 @@ async function register(req, res) {
 
         await sendOtp(user.username, user.email, code);
 
-        const token = generateToken(user, 'verify_otp');
+        const otpToken = generateToken(user, 'verify_otp');
 
         await dbLog.write(user.id, 'Info', actionType, `${msg.SUCCESS.USER_CREATED}: ${user.email}`);
         return res.status(status.CREATED).json({ 
@@ -63,7 +64,7 @@ async function register(req, res) {
                 username: user.username,
                 role: user.role
             },
-            token
+            otpToken
         });
     } catch (err) {
         console.error(err);
@@ -123,14 +124,7 @@ async function sendOtp(username, email, code) {
 
 async function verifyOtp(req, res) {
     const actionType = dbLog.actionTypes.AUTH.VERIFY;
-
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-        return res.status(status.UNAUTHORIZED).json({ message: 'Missing token' });
-    }
-
-    const payload = await verifyOtpToken(authHeader, actionType, res);
+    const payload = req.user;
 
     try {
         const user = await prisma.user.findUnique({
@@ -177,39 +171,17 @@ async function verifyOtp(req, res) {
             })
         ]);
 
+        const token = generateToken(user);
+
         await dbLog.write(user.id, 'Info', actionType, `${msg.SUCCESS.USER_VERIFIED}: ${user.email}`);
         return res.status(status.OK).json({ message: msg.SUCCESS.USER_VERIFIED, 
-            user: {
-                id: user.id.toString(),
-                email: user.email,
-                username: user.username,
-                role: user.role
-            }, 
+            token, 
             status: 'success' });
     } catch (err) {
         console.error(err);
         
         await dbLog.write(null, 'Error', actionType, `${msg.FAILURE.INTERNAL_SERVER_ERROR}`);
         return res.status(status.INTERNAL_SERVER_ERROR).json({ message: msg.FAILURE.INTERNAL_SERVER_ERROR, status: 'error' });
-    }
-}
-
-async function verifyOtpToken(authHeader, actionType, res) {
-    const token = authHeader.replace('Bearer ', '');
-
-    try {
-        const payload = jwt.verify(token, SERVER_ENV.jwt_secret);
-    
-        if (payload.scope !== 'verify_otp') {
-            // ADD DBLOG
-            return res.status(status.FORBIDDEN).json({ message: 'Invalid token scope' });
-        }
-
-        return payload;
-    } catch (err) {
-        console.error(err);
-        // ADD DBLOG
-        return res.status(status.UNAUTHORIZED).json({ message: 'Invalid or expired token' });
     }
 }
 
@@ -238,27 +210,21 @@ async function login(req, res) {
         }
 
         if (!user.isVerified) {
-            const token = generateToken(user, 'verify_otp');
+            const otpToken = generateToken(user, 'verify_otp');
 
             const code = await generateOtp(user);
 
             await sendOtp(user.username, user.email, code);
 
             await dbLog.write(user.id, 'Error', actionType, msg.EXCEPTION.USER_NOT_VERIFIED);
-            return res.status(status.FORBIDDEN).json({ message: msg.EXCEPTION.USER_NOT_VERIFIED, status: 'error', token });
+            return res.status(status.FORBIDDEN).json({ message: msg.EXCEPTION.USER_NOT_VERIFIED, status: 'error', otpToken });
         }
 
         const token = generateToken(user);
 
         await dbLog.write(user.id, 'Info', actionType, msg.SUCCESS.USER_AUTHENTICATED);
         return res.status(status.OK).json({ message: msg.SUCCESS.USER_AUTHENTICATED,
-            token, 
-            user: {
-                id: user.id.toString(),
-                email: user.email,
-                username: user.username,
-                role: user.role
-            }, 
+            token,
             status: 'success' });
     } catch (err) {
         console.error(err);

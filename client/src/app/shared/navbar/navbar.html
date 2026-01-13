@@ -1,0 +1,52 @@
+<mat-sidenav-container class="layout">
+    <mat-sidenav
+        #sidenav
+        class="sidenav"
+    >
+        <div class="user-section">
+            <div class="avatar">
+                <mat-icon>person</mat-icon>
+            </div>
+
+            <div class="username" [title]="auth.user?.username">
+                Hello, {{ auth.user?.username || 'User' }}
+            </div>
+        </div>
+
+        <mat-nav-list>
+            <mat-list-item 
+                routerLink="/item" 
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                (click)="sidenav.close()"
+            >
+                <mat-icon matListItemIcon>inventory_2</mat-icon>
+                <span matListItemTitle>Items</span>
+            </mat-list-item>
+
+            <mat-list-item (click)="logout()" class="nav-item">
+                <mat-icon matListItemIcon>logout</mat-icon>
+                <span matListItemTitle>Logout</span>
+            </mat-list-item>
+        </mat-nav-list>
+
+        <mat-divider></mat-divider>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+        <mat-toolbar color="primary" class="navbar">
+            <button
+                mat-icon-button
+                (click)="toggleSidenav()"
+                aria-label="Open menu"
+            >
+                <mat-icon>menu</mat-icon>
+            </button>
+
+            <span class="app-title">Accordia Portal</span>
+            <span class="spacer"></span>
+        </mat-toolbar>
+
+        <ng-content></ng-content>
+    </mat-sidenav-content>
+</mat-sidenav-container>

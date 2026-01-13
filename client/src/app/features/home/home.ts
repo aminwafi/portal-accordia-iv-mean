@@ -4,10 +4,17 @@ import { FormBuilder, ReactiveFormsModule, Validators, FormGroup, AbstractContro
 import { AuthService } from '../../core/services/auth';
 import { finalize } from 'rxjs';
 import { OtpModalComponent } from './otp-modal/otp-modal';
+import { Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, ReactiveFormsModule, OtpModalComponent],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    OtpModalComponent,
+    MatIconModule
+  ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -23,16 +30,25 @@ export class HomeComponent {
 
   activeTab: 'register' | 'login' = 'register';
 
+  showRegisterPassword = false;
+  showRegisterConfirmPassword = false;
+  showLoginPassword = false;
+
   showOtpModal = false;
 
   constructor(
+    private router: Router,
     private fb: FormBuilder,
     private auth: AuthService
   ){
 
     this.registerForm = this.fb.nonNullable.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [
+        Validators.required, 
+        Validators.minLength(8),
+        this.passwordStrengthValidator
+      ]],
       confirmPassword: ['', Validators.required]
     },
     { validators: this.passwordMatchValidator }
@@ -50,6 +66,36 @@ export class HomeComponent {
 
     if (!password || !confirmPassword) return null;
     return password == confirmPassword ? null : { passwordMismatch: true };
+  }
+
+  passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
+    const password = control.value as string;
+
+    if (!password) return null;
+
+    const errors: ValidationErrors = {};
+
+    if (!/[A-Z]/.test(password)) {
+      errors['uppercase'] = true;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      errors['lowercase'] = true;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      errors['number'] = true;
+    }
+
+    if (!/[#?!@$%^&*-]/.test(password)) {
+      errors['special'] = true;
+    }
+
+    if (/\s/.test(password)) {
+      errors['space'] = true;
+    }
+
+    return Object.keys(errors).length ? errors : null;
   }
 
   register(): void {
@@ -73,7 +119,7 @@ export class HomeComponent {
       next: (res: any) => {
       this.registerForm.reset();
       alert(`Registration successful`);
-      this.openOtp(res.token);
+      this.openOtp(res.otpToken);
     },
     error: (err) => {
       console.error(err);
@@ -96,7 +142,8 @@ export class HomeComponent {
     .pipe(finalize(() => (this.isLoggingIn = false)))
     .subscribe({
       next: () => {
-        alert('Login successful')
+        alert('Login successful');
+        this.router.navigate(['/item'], { replaceUrl: true })
       },
       error: (err) => {
         console.error(err);
@@ -104,7 +151,7 @@ export class HomeComponent {
           err?.error?.message || 'Invalid credentials'
 
         if (err?.error?.message === 'User not verified') {
-          this.openOtp(err?.error?.token);
+          this.openOtp(err?.error?.otpToken);
           return;
         }
       }
@@ -112,7 +159,22 @@ export class HomeComponent {
   }
 
   switchTab(tab: 'register' | 'login') {
+    if (this.activeTab === tab) return;
+
     this.activeTab = tab;
+
+    this.registerForm.reset();
+    this.loginForm.reset();
+
+    this.registerError = null;
+    this.loginError = null;
+
+    this.isRegistering = false;
+    this.isLoggingIn = false;
+
+    this.showRegisterPassword = false;
+    this.showRegisterConfirmPassword = false;
+    this.showLoginPassword = false;
   }
 
   openOtp(token: string) {
@@ -126,6 +188,8 @@ export class HomeComponent {
 
   onOtpVerified() {
     this.showOtpModal = false;
+    this.loginError = null;
+    this.loginForm.reset();
     alert('Account verified successfully');
   }
 

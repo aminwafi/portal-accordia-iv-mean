@@ -10,8 +10,18 @@ const actionTypes = {
         GENERATE_OTP: 'Generate otp',
         VERIFY: 'Verify otp',
         SEND_OTP: 'Send otp',
-        AUTHENTICATE: 'Authenticate user token'
+        AUTHENTICATE: 'Authenticate user token',
+        AUTHENTICATE_VERIFY_OTP: 'Authenticate verify otp token',
+        AUTHENTICATE_ADMIN: 'Authenticate admin',
+        VALIDATE_SCHEMA: 'Validate schema'
     },
+    ITEM: {
+        LIST: 'List all item',
+        GET: 'Get an item',
+        CREATE: 'Create a new item',
+        UPDATE: 'Update an item',
+        DELETE: 'Delete an item'
+    }
 };
 
 async function writeLogToDB(userId, logType, actionType, description) {
